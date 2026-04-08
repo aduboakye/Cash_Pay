@@ -114,7 +114,7 @@ class _ApplyPageState extends State<ApplyPage> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF3A3A3A), Colors.white],
+            colors: [Colors.black, Color(0xFF3A3A3A), Colors.white],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -167,21 +167,21 @@ class _ApplyPageState extends State<ApplyPage> {
               _buildLabel("Next of Kin Details"),
               _buildInput("Michael Mensah"),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
 
               /// Submit Button
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 18),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Colors.black,
                   borderRadius: BorderRadius.circular(40),
                 ),
                 child: const Center(
                   child: Text(
                     "Submit Application",
                     style: TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
@@ -189,11 +189,11 @@ class _ApplyPageState extends State<ApplyPage> {
                 ),
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
 
               const Text(
                 "By applying, you agree to our Terms and Conditions",
-                style: TextStyle(color: Colors.black, fontSize: 12),
+                style: TextStyle(color: Colors.black, fontSize: 15),
                 textAlign: TextAlign.center,
               ),
             ],

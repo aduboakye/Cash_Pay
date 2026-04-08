@@ -4,6 +4,7 @@ import 'loginAndsignup_Page/signup_page.dart';
 import 'package:flutter/material.dart';
 import 'homepage/homepage.dart';
 import 'InformationPage/apply_page.dart';
+import 'InformationPage/payment.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-      home: const Homepage(),
+      home: const Payment(),
     );
   }
 }
