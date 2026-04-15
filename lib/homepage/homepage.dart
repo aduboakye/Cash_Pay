@@ -293,7 +293,7 @@ class _HomepageState extends State<Homepage>
           ),
         ),
         child: ListView(
-          children: const [
+          children: [
             DrawerHeader(
               child: Text(
                 "Menu",
@@ -307,10 +307,49 @@ class _HomepageState extends State<Homepage>
             ListTile(
               leading: Icon(Icons.home, color: Colors.white),
               title: Text("Home", style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+              },
             ),
+
             ListTile(
               leading: Icon(Icons.person, color: Colors.white),
               title: Text("Profile", style: TextStyle(color: Colors.white)),
+            ),
+            ListTile(
+              leading: Icon(Icons.settings, color: Colors.white),
+              title: Text("Settings", style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context); // close drawer
+              },
+            ),
+
+            ListTile(
+              leading: Icon(Icons.info, color: Colors.white),
+              title: Text("About", style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context); // close drawer first
+
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text("About Cash Pay"),
+                      content: Text(
+                        "Cash Pay is a secure and fast payment system that allows users to send, receive, and manage money easily.",
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context); // close dialog
+                          },
+                          child: Text("OK"),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
             ),
           ],
         ),
