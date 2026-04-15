@@ -5,6 +5,10 @@ import 'package:loan_app/reuseableWidget/listwidget.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 import 'package:blinking_border/blinking_border.dart';
 
+import '../InformationPage/apply_page.dart';
+import '../InformationPage/payment.dart';
+import '../MessageUi/messages.dart';
+
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
 
@@ -12,14 +16,42 @@ class Homepage extends StatefulWidget {
   State<Homepage> createState() => _HomepageState();
 }
 
-class _HomepageState extends State<Homepage> {
+class _HomepageState extends State<Homepage>
+    with SingleTickerProviderStateMixin {
   // Draggable icon position
   double top = 500;
   double left = 250;
 
-  // Track separate selection states
+  // Track separate selection states to avoid conflicts
   int gridSelectedIndex = -1;
   int listSelectedIndex = -1;
+
+  late AnimationController _pulseController;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    // Continuous pulsing animation for the "Apply Loan" alert
+    _pulseController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.06).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  void _navigateToPage(Widget page) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => page));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,9 +85,7 @@ class _HomepageState extends State<Homepage> {
       bottomNavigationBar: _buildBottomNavBar(),
       body: Stack(
         children: [
-          // Background
           Container(color: Colors.white),
-
           Positioned.fill(
             child: SafeArea(
               child: Column(
@@ -73,7 +103,6 @@ class _HomepageState extends State<Homepage> {
                       ),
                     ),
                   ),
-
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 15,
@@ -87,7 +116,6 @@ class _HomepageState extends State<Homepage> {
                         Colors.pink,
                       ],
                       rotationDuration: const Duration(seconds: 3),
-                      glowLocation: GlowLocation.both,
                       showAnimatedBorder: true,
                       containerOptions: ContainerOptions(
                         width: double.infinity,
@@ -95,20 +123,17 @@ class _HomepageState extends State<Homepage> {
                         borderRadius: 30,
                         backgroundColor: const Color(0xFF3A3A3A),
                       ),
-                      transitionDuration: const Duration(milliseconds: 300),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(30),
                         child: Image.asset(
                           'images/cashpay.jpeg',
-                          width: double.infinity,
-                          height: double.infinity,
                           fit: BoxFit.cover,
                         ),
                       ),
                     ),
                   ),
 
-                  // Grid buttons
+                  // GRID SECTION: Uses gridSelectedIndex
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 15,
@@ -121,107 +146,110 @@ class _HomepageState extends State<Homepage> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
-                        _buildSelectableGridItem(0, Icons.payment, "Pay Loan"),
+                        _buildSelectableGridItem(
+                          0,
+                          Icons.payment,
+                          "Pay Loan",
+                          const Payment(),
+                        ),
                         _buildSelectableGridItem(
                           1,
                           Icons.request_page,
                           "Request Loan",
+                          const Payment(),
                         ),
-
-                        // Apply Loan with zoom animation
-                        ZoomTapAnimation(
-                          onTap: () {
-                            // Handle Apply Loan action
-                            print("Apply Loan tapped");
-                          },
-                          child: _buildSelectableGridItem(
-                            2,
-                            Icons.task_alt,
-                            "Apply Loan",
+                        ScaleTransition(
+                          scale: _scaleAnimation,
+                          child: BlinkingBorder(
+                            color: Colors.blueAccent,
+                            strokeWidth: 3.0,
+                            borderRadius: BorderRadius.circular(15.0),
+                            duration: const Duration(milliseconds: 500),
+                            child: ZoomTapAnimation(
+                              onTap: () {
+                                setState(() => gridSelectedIndex = 2);
+                                _navigateToPage(const ApplyPage());
+                              },
+                              child: _buildSelectableGridItem(
+                                2,
+                                Icons.task_alt,
+                                "Apply Loan",
+                                const ApplyPage(),
+                                isCustomTap: true,
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
 
-                  // Animated scroll list
-                  Flexible(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 5),
-                      child: ClipRect(
-                        child: ListView.builder(
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: 10,
-                          itemBuilder: (context, index) {
-                            return AnimatedScrollItem(
-                              size: const Size(double.infinity, 150),
-                              configs: [
-                                ItemAnimationConfig(
-                                  itemTransform:
-                                      (animationValue, size, matrix) {
-                                        final curveValue = Curves.easeOutBack
-                                            .transform(animationValue);
-                                        return matrix
-                                          ..translate(
-                                            0.0,
-                                            (1 - curveValue) * 25,
-                                          )
-                                          ..scale(0.95 + 0.05 * curveValue);
-                                      },
-                                ),
-                              ],
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    listSelectedIndex = index;
-                                  });
-                                },
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 300),
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 15,
-                                    vertical: 4,
-                                  ),
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: listSelectedIndex == index
-                                        ? Colors.blue.withOpacity(0.15)
-                                        : Colors.grey.shade900,
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: listSelectedIndex == index
-                                          ? Colors.blue
-                                          : Colors.transparent,
-                                      width: 2,
-                                    ),
-                                    boxShadow: [
-                                      if (listSelectedIndex == index)
-                                        BoxShadow(
-                                          color: Colors.blue.withOpacity(0.3),
-                                          blurRadius: 12,
-                                          offset: const Offset(0, 5),
-                                        ),
-                                    ],
-                                  ),
-                                  child: Listwidget(index: index),
+                  // LIST SECTION: Uses listSelectedIndex
+                  Expanded(
+                    child: ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: 10,
+                      itemBuilder: (context, index) {
+                        return AnimatedScrollItem(
+                          size: const Size(double.infinity, 150),
+                          configs: [
+                            ItemAnimationConfig(
+                              itemTransform: (animationValue, size, matrix) {
+                                final curveValue = Curves.easeOutBack.transform(
+                                  animationValue,
+                                );
+                                return matrix
+                                  ..setTranslationRaw(
+                                    0.0,
+                                    (1 - curveValue) * 25,
+                                    0.0,
+                                  )
+                                  ..scale(0.95 + 0.05 * curveValue);
+                              },
+                            ),
+                          ],
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                listSelectedIndex = index;
+                              });
+                              _navigateToPage(const Payment());
+                            },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 15,
+                                vertical: 4,
+                              ),
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: listSelectedIndex == index
+                                    ? Colors.blue.withOpacity(0.15)
+                                    : Colors.grey.shade900,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: listSelectedIndex == index
+                                      ? Colors.blue
+                                      : Colors.transparent,
+                                  width: 2,
                                 ),
                               ),
-                            );
-                          },
-                        ),
-                      ),
+                              child: Listwidget(index: index),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],
               ),
             ),
           ),
-
-          // Draggable chat icon
           Positioned(
             top: top,
             left: left,
             child: GestureDetector(
+              onTap: () => _navigateToPage(const Messages()),
               onPanUpdate: (details) {
                 setState(() {
                   top += details.delta.dy;
@@ -254,15 +282,14 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  // Drawer
   Widget _buildDrawer() {
     return Drawer(
       child: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
+            colors: [Color(0xFF3A3A3A), Colors.white],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF3A3A3A), Colors.white],
           ),
         ),
         child: ListView(
@@ -285,27 +312,21 @@ class _HomepageState extends State<Homepage> {
               leading: Icon(Icons.person, color: Colors.white),
               title: Text("Profile", style: TextStyle(color: Colors.white)),
             ),
-            ListTile(
-              leading: Icon(Icons.settings, color: Colors.white),
-              title: Text("Settings", style: TextStyle(color: Colors.white)),
-            ),
-            ListTile(
-              leading: Icon(Icons.info, color: Colors.white),
-              title: Text("About ", style: TextStyle(color: Colors.white)),
-            ),
           ],
         ),
       ),
     );
   }
 
-  // Bottom nav bar
-  BottomNavigationBar _buildBottomNavBar() {
+  Widget _buildBottomNavBar() {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       backgroundColor: const Color(0xFF3A3A3A),
       selectedItemColor: Colors.white,
       unselectedItemColor: Colors.white,
+      onTap: (index) {
+        if (index == 1 || index == 2) _navigateToPage(const Payment());
+      },
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
         BottomNavigationBarItem(
@@ -321,22 +342,29 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  // Separate Grid Item selection logic
-  Widget _buildSelectableGridItem(int index, IconData icon, String label) {
+  Widget _buildSelectableGridItem(
+    int index,
+    IconData icon,
+    String label,
+    Widget page, {
+    bool isCustomTap = false,
+  }) {
     bool isSelected = gridSelectedIndex == index;
     return GestureDetector(
-      onTap: () => setState(() => gridSelectedIndex = index),
+      onTap: isCustomTap
+          ? null
+          : () {
+              setState(() => gridSelectedIndex = index);
+              _navigateToPage(page);
+            },
       child: AnimatedScale(
         scale: isSelected ? 1.05 : 1.0,
         duration: const Duration(milliseconds: 200),
         child: GlowContainer(
-          glowRadius: isSelected ? 15 : 10,
+          glowRadius: 15,
           gradientColors: isSelected
               ? [Colors.blue, Colors.purple, Colors.pink]
               : [Colors.black, Colors.white, Colors.blue],
-          rotationDuration: const Duration(seconds: 2),
-          showAnimatedBorder: true,
-          transitionDuration: const Duration(milliseconds: 300),
           containerOptions: ContainerOptions(
             height: 100,
             borderRadius: 15,

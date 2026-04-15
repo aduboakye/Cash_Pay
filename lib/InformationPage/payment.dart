@@ -26,7 +26,6 @@ class _PaymentState extends State<Payment> {
         if (amount == "0") {
           amount = value;
         } else {
-          // Limit length to 9 digits to maintain readability
           if (amount.length < 9) {
             amount += value;
           }
@@ -41,7 +40,6 @@ class _PaymentState extends State<Payment> {
     String integerPart = parts[0];
     String decimalPart = parts.length > 1 ? '.' + parts[1] : '';
 
-    // Regex to add commas as thousands separators
     RegExp reg = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
     integerPart = integerPart.replaceAllMapped(reg, (Match m) => '${m[1]},');
 
@@ -51,18 +49,21 @@ class _PaymentState extends State<Payment> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Color(0xFF3A3A3A),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-
+        // Added white back button
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: const Text('Cash Pay', style: TextStyle(color: Colors.white)),
         centerTitle: true,
       ),
       body: SafeArea(
         child: Column(
           children: [
-            // Amount Display with FittedBox to prevent overflow
             Expanded(
               child: Center(
                 child: Padding(
@@ -98,8 +99,6 @@ class _PaymentState extends State<Payment> {
                 ),
               ),
             ),
-
-            // White Keypad Container
             Container(
               height: 400,
               width: double.infinity,
@@ -113,7 +112,6 @@ class _PaymentState extends State<Payment> {
               child: Column(
                 children: [
                   const SizedBox(height: 30),
-                  // Numeric Keypad
                   Expanded(
                     child: GridView.count(
                       padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -139,8 +137,6 @@ class _PaymentState extends State<Payment> {
                 ],
               ),
             ),
-
-            // Bottom Action Buttons
             Container(
               color: Colors.white,
               child: Padding(

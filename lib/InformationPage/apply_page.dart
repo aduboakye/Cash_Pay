@@ -105,7 +105,11 @@ class _ApplyPageState extends State<ApplyPage> {
           ),
         ),
         elevation: 0,
-        leading: const Icon(Icons.arrow_back),
+        // Fixed: Added white IconButton with pop navigation
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: const Text(
           "Apply for a Loan",
           style: TextStyle(color: Colors.white),

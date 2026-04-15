@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../homepage/homepage.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -24,7 +25,7 @@ class _SignupPageState extends State<SignupPage> {
       body: Stack(
         children: [
           // Black background
-          Container(color: Colors.black),
+          Container(color: Color(0xFF3A3A3A)),
 
           // White container
           Align(
@@ -148,7 +149,7 @@ class _SignupPageState extends State<SignupPage> {
                       // Button
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
+                          backgroundColor: Color(0xFF3A3A3A),
                           minimumSize: const Size(double.infinity, 50),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
@@ -156,11 +157,13 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            if (isLogin) {
-                              print("Login logic here");
-                            } else {
-                              print("Signup logic here");
-                            }
+                            // After successful validation, navigate to Homepage
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const Homepage(),
+                              ),
+                            );
                           }
                         },
                         child: Text(
